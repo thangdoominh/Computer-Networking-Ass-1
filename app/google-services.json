@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "980798163583",
+    "firebase_url": "https://computernetworking1-9b979.firebaseio.com",
+    "project_id": "computernetworking1-9b979",
+    "storage_bucket": "computernetworking1-9b979.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:980798163583:android:c3100243584b2601480d4a",
+        "android_client_info": {
+          "package_name": "com.example.computer_networking_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "980798163583-ouhol0fa8u7v9baijh5vhukqkd7dikdb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.computer_networking_1",
+            "certificate_hash": "ab9d41f8bd930d02a4b6058cccddb3aeae88ec86"
+          }
+        },
+        {
+          "client_id": "980798163583-hm231tbu83e9l52o3o26oe9j4m7li6nr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAR4wA2HoumSEoiBmHkFb8-w1Zd7MVm5-4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "980798163583-hm231tbu83e9l52o3o26oe9j4m7li6nr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
