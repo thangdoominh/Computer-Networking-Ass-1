@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name='COMPUTER_NETWORKING_1'
