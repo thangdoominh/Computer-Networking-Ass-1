@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "453224304154",
+    "firebase_url": "https://computernetworking1-f502f.firebaseio.com",
+    "project_id": "computernetworking1-f502f",
+    "storage_bucket": "computernetworking1-f502f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:453224304154:android:4aebc8a68663681c91cba3",
+        "android_client_info": {
+          "package_name": "com.example.computer_networking_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "453224304154-pdk9skif5n30kkh7ogv31piadu9lbrre.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.computer_networking_1",
+            "certificate_hash": "ca622cf91c33247d11541e672b28ea483ab8ca48"
+          }
+        },
+        {
+          "client_id": "453224304154-5lvkkum2ok6bvcho4o7mcjebo5rum7ro.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiP-q_iNZKVWszUKbItahwSZV5f7E1RjQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "453224304154-5lvkkum2ok6bvcho4o7mcjebo5rum7ro.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
