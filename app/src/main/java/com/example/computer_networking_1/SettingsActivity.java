@@ -1,28 +1,144 @@
 package com.example.computer_networking_1;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingsActivity extends AppCompatActivity {
     private Button UpdateAccountSettings;
     private EditText userName, userStatus;
+    private TextView userid;
     private CircleImageView userProfileImage;
+
+    private String currentUserID;
+    private FirebaseAuth mAuth;
+    private DatabaseReference reference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference = FirebaseDatabase.getInstance().getReference();
         InitializeFields();
+        UpdateAccountSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UpdateSettings();
+            }
+        });
+        
+        RetrieveUserInfo();
     }
+
+    private void RetrieveUserInfo() {
+        userid.setText(currentUserID);
+        reference.child("Users").child(currentUserID)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists() && dataSnapshot.hasChild("username") && dataSnapshot.hasChild("imageURL")){
+                            String retrieveUserName = dataSnapshot.child("username").getValue().toString();
+                            String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
+                            String retrieveProfileImage = dataSnapshot.child("imageURL").getValue().toString();
+
+                            userName.setText(retrieveUserName);
+                            userStatus.setText(retrieveUserStatus);
+
+                        }
+                        else if(dataSnapshot.exists() && dataSnapshot.hasChild("username")){
+                            String retrieveUserName = dataSnapshot.child("username").getValue().toString();
+                            String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
+
+                            userName.setText(retrieveUserName);
+                            userStatus.setText(retrieveUserStatus);
+                        }
+                        else{
+                            Toast.makeText(SettingsActivity.this,"Please update your profile information",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    private void UpdateSettings(){
+        String setUserName = userName.getText().toString();
+        String setStatus = userStatus.getText().toString();
+        if (TextUtils.isEmpty(setUserName)){
+            Toast.makeText(this,"Please write your username...",Toast.LENGTH_SHORT).show();
+        }
+        else {
+            HashMap<String,String> profileMap = new HashMap<>();
+            profileMap.put("username", setUserName);
+            profileMap.put("status", setStatus);
+            reference.child("Users").child(currentUserID).child("status").setValue(setStatus)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                reference.child("Users").child(currentUserID).child("username").setValue(setUserName)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    SendUserToMainActivity();
+                                                    Toast.makeText(SettingsActivity.this,"Profile updated successfully!",Toast.LENGTH_SHORT).show();
+                                                }
+                                                else{
+                                                    String message = task.getException().toString();
+                                                    Toast.makeText(SettingsActivity.this, "Error: " + message,Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+                            }
+                            else{
+                                String message = task.getException().toString();
+                                Toast.makeText(SettingsActivity.this, "Error: " + message,Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void SendUserToMainActivity() {
+        Intent mainIntent = new Intent(SettingsActivity.this, MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(mainIntent);
+        finish();
+    }
+
 
     private void InitializeFields() {
         UpdateAccountSettings = (Button) findViewById(R.id.update_settings_button);
-        userName = (EditText) findViewById(R.id.username);
+        userid = (TextView) findViewById(R.id.user_id);
+        userName = (EditText) findViewById(R.id.set_user_name);
         userStatus = (EditText) findViewById(R.id.set_profile_status);
         userProfileImage = (CircleImageView) findViewById(R.id.profile_image);
     }
+    private void showId(){}
 }

@@ -84,6 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 hashMap.put("imageURL","default");
                                 if(TextUtils.isEmpty(username)) hashMap.put("username", userid);
                                 else hashMap.put("username", username);
+                                hashMap.put("status", "I'm online");
 
                                 reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
