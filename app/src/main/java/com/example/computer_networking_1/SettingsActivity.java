@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -37,7 +38,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final int GalleryPick = 1;
     private StorageReference UserProfileImagesRef;
-
+    private ProgressDialog loadingBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUserID = mAuth.getCurrentUser().getUid();
+        RootRef = FirebaseDatabase.getInstance().getReference();
         UserProfileImagesRef = FirebaseStorage.getInstance().getReference().child("Profile Images");
 
 
@@ -71,6 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
         userName = (EditText) findViewById(R.id.username);
         userStatus = (EditText) findViewById(R.id.set_profile_status);
         userProfileImage = (CircleImageView) findViewById(R.id.profile_image);
+        loadingBar = new ProgressDialog(this);
     }
 
 
@@ -94,6 +97,11 @@ public class SettingsActivity extends AppCompatActivity {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if(resultCode == RESULT_OK){
+                loadingBar.setTitle("Set Profile Image");
+                loadingBar.setMessage("Please wait, your profile image is updating ...");
+                loadingBar.setCanceledOnTouchOutside(false);
+                loadingBar.show();
+
                 Uri resultUri = result.getUri();
 
                 StorageReference filePath = UserProfileImagesRef.child(currentUserID + ".jpg");
@@ -102,16 +110,38 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()){
-                            Toast.makeText(SettingsActivity.this, "Profile Image Upload Successful ... ",Toast.LENGTH_LONG).show();
+                            Toast.makeText(SettingsActivity.this, "Profile Image Upload Successful ... ",Toast.LENGTH_SHORT).show();
+
+//                           ???????  khong chac lam chac
+//                            final String downloadUrl = path.getDownloadUrl().toString();
+                            final String downloadUrl = task.getResult().getMetadata().getReference().getDownloadUrl().toString();
+
+                            System.out.println(" dkm " + downloadUrl);
+                            RootRef.child("Users").child(currentUserID).child("imageURL")
+                                    .setValue(downloadUrl)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()){
+                                                Toast.makeText(SettingsActivity.this, "Image save, Successfull ...", Toast.LENGTH_SHORT).show();
+                                                loadingBar.dismiss();
+                                            }
+                                            else{
+                                                String message = task.getException() .toString();
+                                                Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                                                loadingBar.dismiss();
+                                            }
+                                        }
+                                    });
                         }
                         else{
                             String message = task.getException() .toString();
                             Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                            loadingBar.dismiss();
                         }
                     }
                 });
             }
-
         } // --------  End of upload and storage profile image -----------------
     }
 }
