@@ -4,6 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
+    compileOptions.encoding = 'utf-8'
     defaultConfig {
         applicationId "com.example.computer_networking_1"
         minSdkVersion 17
