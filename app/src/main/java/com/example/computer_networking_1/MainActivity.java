@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
             SendUserToSettingsActivity();
         }
         if(item.getItemId() == R.id.main_find_friends_option){
-
+            SendUserToChatPPActivity();
         }
         if(item.getItemId() == R.id.main_create_group_option)
         {
@@ -176,6 +176,12 @@ public class MainActivity extends AppCompatActivity {
     private void SendUserToSettingsActivity() {
         Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
         settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(settingsIntent);
+        finish();
+    }
+    private void SendUserToChatPPActivity() {
+        Intent settingsIntent = new Intent(MainActivity.this, ChatPPActivity.class);
+        //settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(settingsIntent);
         finish();
     }
