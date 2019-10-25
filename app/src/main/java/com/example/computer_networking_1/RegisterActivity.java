@@ -81,7 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
                                 HashMap<String,String> hashMap = new HashMap<>();
                                 hashMap.put("id",userid);
-                                hashMap.put("imageURL","default");
+                                hashMap.put("imageURL","https://firebasestorage.googleapis.com/v0/b/computernetworking1-9b979.appspot.com/o/Profile%20Images%2Fdefault.png?alt=media&token=9932465c-1cb4-49cb-b0ca-25433d360d11");
                                 if(TextUtils.isEmpty(username)) hashMap.put("username", userid);
                                 else hashMap.put("username", username);
                                 hashMap.put("status", "I'm online");
