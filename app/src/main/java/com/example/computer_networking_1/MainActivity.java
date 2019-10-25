@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
-    private DatabaseReference RootRef;
+    private DatabaseReference reference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        RootRef = FirebaseDatabase.getInstance().getReference();
+        reference = FirebaseDatabase.getInstance().getReference();
 
         mToolbar = (Toolbar) findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
@@ -65,23 +65,22 @@ public class MainActivity extends AppCompatActivity {
 
         if(currentUser == null){
             SendUserToLoginActivity();
-
         }
-        else
-        {
+        else{
             VerifyUserExistance();
         }
     }
 
-    private void VerifyUserExistance()
-    {
+    private void VerifyUserExistance() {
         String currentUserID = mAuth.getCurrentUser().getUid();
-        RootRef.child(currentUserID).addValueEventListener(new ValueEventListener() {
+        reference.child("Users").child(currentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if ((dataSnapshot.child("name")).exists())
-                {
-                      Toast.makeText(MainActivity.this,"Welcome", Toast.LENGTH_SHORT).show();
+                if(dataSnapshot.child("username").exists()){
+                    Toast.makeText(MainActivity.this,"Welcome",Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    SendUserToSettingsActivity();
                 }
             }
 
@@ -94,7 +93,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void SendUserToLoginActivity() {
         Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(loginIntent);
+        finish();
     }
 
     @Override
@@ -160,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void CreateNewGroup(String groupName)
     {
-        RootRef.child("Groups").child(groupName).setValue("")
+        reference.child("Groups").child(groupName).setValue("")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -174,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void SendUserToSettingsActivity() {
         Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(settingsIntent);
+        finish();
     }
 }
