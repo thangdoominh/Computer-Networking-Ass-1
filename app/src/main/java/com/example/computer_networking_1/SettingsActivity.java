@@ -35,7 +35,7 @@ import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingsActivity extends AppCompatActivity {
-    private Button UpdateAccountSettings;
+    private Button UpdateAccountSettings, backButton;
     private EditText userName, userStatus;
     private TextView userid;
     private CircleImageView userProfileImage;
@@ -65,6 +65,13 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 UpdateSettings();
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SendUserToMainActivity();
             }
         });
 
@@ -170,6 +177,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void InitializeFields() {
         UpdateAccountSettings = (Button) findViewById(R.id.update_settings_button);
+        backButton = (Button)findViewById(R.id.back_button);
         userid = (TextView) findViewById(R.id.user_id);
         userName = (EditText) findViewById(R.id.set_user_name);
         userStatus = (EditText) findViewById(R.id.set_profile_status);
@@ -224,12 +232,12 @@ public class SettingsActivity extends AppCompatActivity {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if (task.isSuccessful()){
-                                                            Toast.makeText(SettingsActivity.this, " Image save, Successfull ...", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(SettingsActivity.this, " Image saved", Toast.LENGTH_SHORT).show();
                                                             loadingBar.dismiss();
                                                         }
                                                         else{
                                                             String message = task.getException().toString();
-                                                            Toast.makeText(SettingsActivity.this, "Error :" + message, Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(SettingsActivity.this, "Error : " + message, Toast.LENGTH_SHORT).show();
                                                             loadingBar.dismiss();
                                                         }
                                                     }
