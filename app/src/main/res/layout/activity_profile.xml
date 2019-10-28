@@ -46,6 +46,7 @@
         android:textStyle="italic" />
 
     <Button
+        android:id="@+id/visit_profile_send_message_request"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/visit_profile_status"
@@ -57,9 +58,7 @@
         android:textSize="20dp"
         android:text="Send Message"
         android:textAllCaps="false"
-        android:background="#E1AAEB"
-
-
+        android:background="#E1AAEB" />
 
 
 </RelativeLayout>
