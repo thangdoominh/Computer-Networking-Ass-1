@@ -1,2 +1,1 @@
-include ':app'
-rootProject.name='COMPUTER_NETWORKING_1'
+include ':app', ':barcode-reader'
