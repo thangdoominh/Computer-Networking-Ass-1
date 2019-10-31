@@ -103,7 +103,9 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(receiverUserID)){
+
                             String request_type = dataSnapshot.child(receiverUserID).child("request_type").getValue().toString();
+
                             if (request_type.equals("sent")){
                                 current_State = "request_sent";
                                 SendMessageRequestButton.setText("Cancel Chat Request");
@@ -113,19 +115,16 @@ public class ProfileActivity extends AppCompatActivity {
                                 current_State = "request_received";
                                 SendMessageRequestButton.setText("Accept Request");
 
-                                DeclineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                DeclineMessageRequestButton.setVisibility(View.VISIBLE);
                                 DeclineMessageRequestButton.setEnabled(true);
 
                                 DeclineMessageRequestButton.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-//                                        Cancel
+                                        CancelChatRequest();
                                     }
                                 });
                             }
-                        }
-                        else {
-
                         }
                     }
 
@@ -164,6 +163,9 @@ public class ProfileActivity extends AppCompatActivity {
                             SendMessageRequestButton.setEnabled(true);
                             current_State = "new";
                             SendMessageRequestButton.setText("Send Message");
+
+                            DeclineMessageRequestButton.setVisibility(View.INVISIBLE);
+                            DeclineMessageRequestButton.setEnabled(false);
                         }
                     }
                 });
