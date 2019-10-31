@@ -25,7 +25,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String receiverUserID, senderUserID, current_State;
     private CircleImageView userProfileImage;
     private TextView userProfileName, userProfileStatus;
-    private Button SendMessageRequestButton;
+    private Button SendMessageRequestButton, DeclineMessageRequestButton;
 
     private DatabaseReference UserRef, ChatRequestRef;
     private FirebaseAuth mAuth;
@@ -56,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
         userProfileName = findViewById(R.id.visit_profile_name);
         userProfileStatus = findViewById(R.id.visit_profile_status);
         SendMessageRequestButton = findViewById(R.id.visit_profile_send_message_request);
+        DeclineMessageRequestButton = findViewById(R.id.visit_profile_decline_message_request);
         current_State = "new";
 
     }
@@ -104,20 +105,32 @@ public class ProfileActivity extends AppCompatActivity {
                         if (dataSnapshot.hasChild(receiverUserID)){
                             String request_type = dataSnapshot.child(receiverUserID).child("request_type").getValue().toString();
                             if (request_type.equals("sent")){
-                                current_State = "request_type";
+                                current_State = "request_sent";
                                 SendMessageRequestButton.setText("Cancel Chat Request");
-
                             }
+                            else if(request_type.equals("received")){
 
+                                current_State = "request_received";
+                                SendMessageRequestButton.setText("Accept Request");
+
+                                DeclineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                DeclineMessageRequestButton.setEnabled(true);
+
+                                DeclineMessageRequestButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+//                                        Cancel
+                                    }
+                                });
+                            }
                         }
-                        else{
+                        else {
 
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
                     }
                 });
 
@@ -129,12 +142,31 @@ public class ProfileActivity extends AppCompatActivity {
                     if (current_State.equals("new")){
                         SendChatRequest();
                     }
+                    if (current_State.equals("request_sent")){
+                        CancelChatRequest();
+                    }
                 }
             });
         }
         else{
             SendMessageRequestButton.setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void CancelChatRequest() {
+        ChatRequestRef.child(senderUserID).child(receiverUserID)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful())
+                        {
+                            SendMessageRequestButton.setEnabled(true);
+                            current_State = "new";
+                            SendMessageRequestButton.setText("Send Message");
+                        }
+                    }
+                });
     }
 
     private void SendChatRequest() {
@@ -153,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()){
                                                 SendMessageRequestButton.setEnabled(true);
-                                                current_State = "request_type";
+                                                current_State = "request_sent";
                                                 SendMessageRequestButton.setText("Cancel Chat Request");
                                             }
                                         }
