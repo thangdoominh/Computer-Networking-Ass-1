@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -66,8 +67,18 @@ public class FindFriendActivity extends AppCompatActivity {
                         holder.userName.setText(model.getUsername());
                         holder.userStatus.setText(model.getStatus());
                         Picasso.get().load(model.getImageURL()).into(holder.profileImage);
-                    }
 
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                String visit_user_id = getRef(position).getKey();
+
+                                Intent profileIntent = new Intent(FindFriendActivity.this, ProfileActivity.class);
+                                profileIntent.putExtra("visit_user_id", visit_user_id);
+                                startActivity(profileIntent);
+                            }
+                        });
+                    }
                     @NonNull
                     @Override
                     public FindFriendViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {

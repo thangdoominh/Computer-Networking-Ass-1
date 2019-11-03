@@ -13,7 +13,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-<!--        <activity android:name=".FindFriendActivity"></activity>-->
+        <activity android:name=".ProfileActivity"></activity>
+        <!-- <activity android:name=".FindFriendActivity"></activity> -->
         <activity android:name=".GroupChatActivity" />
         <activity android:name=".SettingsActivity" />
         <activity
@@ -28,9 +29,10 @@
         </activity>
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />
-            <activity android:name=".FindFriendActivity"
+        <activity
+            android:name=".FindFriendActivity"
             android:parentActivityName=".MainActivity"
-                tools:ignore="DuplicateActivity"></activity>
+            tools:ignore="DuplicateActivity" />
     </application>
 
 </manifest>
