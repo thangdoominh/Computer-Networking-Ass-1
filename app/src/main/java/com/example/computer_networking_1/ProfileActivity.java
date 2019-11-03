@@ -127,6 +127,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 });
                             }
                         }
+                        // Khi không còn receiverUserID tức là đã thành bạn bè, nên không còn phân biệt người gửi và người nhận
                         else{
                             ContactsRef.child(senderUserID)
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
