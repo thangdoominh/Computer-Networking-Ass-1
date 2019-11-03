@@ -152,7 +152,7 @@ public class GroupChatActivity extends AppCompatActivity
     private void SaveMessageInfoToDatabase()
     {
         String message = userMessageInput.getText().toString();
-        String messagekEY = GroupNameRef.push().getKey();
+        String messageKey = GroupNameRef.push().getKey();
         if (TextUtils.isEmpty(message))
         {
             Toast.makeText(this, "Please write message first...", Toast.LENGTH_SHORT).show();
@@ -171,7 +171,7 @@ public class GroupChatActivity extends AppCompatActivity
             HashMap<String, Object> groupMessageKey = new HashMap<>();
             GroupNameRef.updateChildren(groupMessageKey);
 
-            GroupMessageKeyRef = GroupNameRef.child(messagekEY);
+            GroupMessageKeyRef = GroupNameRef.child(messageKey);
 
             HashMap<String, Object> messageInfoMap = new HashMap<>();
                 messageInfoMap.put("username", currentUserName);

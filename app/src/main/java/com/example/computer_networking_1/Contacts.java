@@ -1,10 +1,9 @@
 package com.example.computer_networking_1;
 
 public class Contacts {
-    public String username, status, imageURL;
+    private String username, status, imageURL;
 
     public Contacts(){
-
     }
 
     public String getUsername() {

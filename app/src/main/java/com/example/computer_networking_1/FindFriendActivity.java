@@ -82,14 +82,11 @@ public class FindFriendActivity extends AppCompatActivity {
     }
 
     public static class FindFriendViewHolder extends RecyclerView.ViewHolder{
-
         TextView userName, userStatus;
         CircleImageView profileImage;
 
         public FindFriendViewHolder(@NonNull View itemView) {
-
             super(itemView);
-
             userName = itemView.findViewById(R.id.user_profile_name);
             userStatus = itemView.findViewById(R.id.user_status);
             profileImage = itemView.findViewById(R.id.user_profile_image);

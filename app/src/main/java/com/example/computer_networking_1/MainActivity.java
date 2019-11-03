@@ -184,4 +184,21 @@ public class MainActivity extends AppCompatActivity {
         Intent findFriendsIntent = new Intent(MainActivity.this, FindFriendActivity.class);
         startActivity(findFriendsIntent);
     }
+
+    private void CheckIfEmailVerified(){
+        if(!currentUser.isEmailVerified()){
+            currentUser.sendEmailVerification()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(getApplicationContext(), "Verification email sent to " + currentUser.getEmail(), Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(), "Failed to send verification email.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }
+    }
 }
