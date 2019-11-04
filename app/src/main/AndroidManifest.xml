@@ -16,11 +16,13 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/iconss"
-        android:label="ChatFull"
+        android:label="Brother"
         android:roundIcon="@drawable/iconss"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".GroupChatFullActivity"></activity>
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".ProfileActivity" />
         <activity android:name=".FindFriendActivity" />
         <activity android:name=".SettingsActivity" />
         <activity
@@ -34,6 +36,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DialogViewActivity" />
+        <activity android:name=".GroupChatActivity" />
         <activity android:name=".ConnectToUserActivity" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".ShowInfoActivity" />
