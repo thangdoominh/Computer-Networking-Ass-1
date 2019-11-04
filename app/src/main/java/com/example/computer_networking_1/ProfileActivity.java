@@ -2,6 +2,8 @@ package com.example.computer_networking_1;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,24 +21,32 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private String receiverUserID, senderUserID, current_State;
     private CircleImageView userProfileImage;
-    private TextView userProfileName, userProfileStatus;
+    private TextView userProfileName, userProfileStatus, userId;
     private Button SendMessageRequestButton, DeclineMessageRequestButton;
 
     private DatabaseReference UserRef, ChatRequestRef, ContactsRef;
     private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
+    private String currentUserID;
+    private DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+
         mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference = FirebaseDatabase.getInstance().getReference();
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
         ChatRequestRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
         ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
@@ -50,11 +61,26 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateOnlineStatus("online");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
+    }
 
     private void GetInformationProfile() {
 
         userProfileImage = findViewById(R.id.visit_profile_image);
         userProfileName = findViewById(R.id.visit_profile_name);
+        userId = findViewById(R.id.visit_user_id);
         userProfileStatus = findViewById(R.id.visit_profile_status);
         SendMessageRequestButton = findViewById(R.id.visit_profile_send_message_request);
         DeclineMessageRequestButton = findViewById(R.id.visit_profile_decline_message_request);
@@ -70,20 +96,21 @@ public class ProfileActivity extends AppCompatActivity {
                     String userImage = dataSnapshot.child("imageURL").getValue().toString();
                     String userName = dataSnapshot.child("username").getValue().toString();
                     String userStatus = dataSnapshot.child("status").getValue().toString();
-
+                    String userGetId = dataSnapshot.child("id").getValue().toString();
                     Picasso.get().load(userImage).placeholder(R.drawable.profile_image).into(userProfileImage);
 
                     userProfileName.setText(userName);
                     userProfileStatus.setText(userStatus);
+                    userId.setText(userGetId);
 
                 }
                 else{
                     String userName = dataSnapshot.child("username").getValue().toString();
                     String userStatus = dataSnapshot.child("status").getValue().toString();
-
+                    String userGetId = dataSnapshot.child("id").getValue().toString();
                     userProfileName.setText(userName);
                     userProfileStatus.setText(userStatus);
-
+                    userId.setText(userGetId);
                 }
 
                 //gửi request gửi tin nhắn
@@ -307,5 +334,12 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 }

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 public class GroupChatActivity extends AppCompatActivity
 {
@@ -39,7 +42,9 @@ public class GroupChatActivity extends AppCompatActivity
     private TextView displayTextMessages;
     private FirebaseAuth mAuth;
     private DatabaseReference UsersRef,GroupNameRef, GroupMessageKeyRef;
-
+    private FirebaseUser currentUser;
+    private String currentUserID;
+    private DatabaseReference reference;
     private String currentGroupName, currenUserID, currentUserName , currentDate, currentTime;
 
     @Override
@@ -53,6 +58,7 @@ public class GroupChatActivity extends AppCompatActivity
 
         mAuth = FirebaseAuth.getInstance();
         currenUserID = mAuth.getCurrentUser().getUid();
+        reference = FirebaseDatabase.getInstance().getReference();
         UsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         GroupNameRef = FirebaseDatabase.getInstance().getReference().child("Groups").child(currentGroupName);
 
@@ -78,7 +84,7 @@ public class GroupChatActivity extends AppCompatActivity
     protected void onStart()
     {
         super.onStart();
-
+        updateOnlineStatus("online");
         GroupNameRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
@@ -115,7 +121,15 @@ public class GroupChatActivity extends AppCompatActivity
         });
     }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
+    }
 
     private void InitializeFields()
     {
@@ -152,7 +166,7 @@ public class GroupChatActivity extends AppCompatActivity
     private void SaveMessageInfoToDatabase()
     {
         String message = userMessageInput.getText().toString();
-        String messagekEY = GroupNameRef.push().getKey();
+        String messageKey = GroupNameRef.push().getKey();
         if (TextUtils.isEmpty(message))
         {
             Toast.makeText(this, "Please write message first...", Toast.LENGTH_SHORT).show();
@@ -171,7 +185,7 @@ public class GroupChatActivity extends AppCompatActivity
             HashMap<String, Object> groupMessageKey = new HashMap<>();
             GroupNameRef.updateChildren(groupMessageKey);
 
-            GroupMessageKeyRef = GroupNameRef.child(messagekEY);
+            GroupMessageKeyRef = GroupNameRef.child(messageKey);
 
             HashMap<String, Object> messageInfoMap = new HashMap<>();
                 messageInfoMap.put("username", currentUserName);
@@ -201,4 +215,10 @@ public class GroupChatActivity extends AppCompatActivity
         }
     }
 
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
+    }
 }

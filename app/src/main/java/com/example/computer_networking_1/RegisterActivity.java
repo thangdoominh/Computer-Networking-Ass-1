@@ -85,6 +85,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 if(TextUtils.isEmpty(username)) hashMap.put("username", userid);
                                 else hashMap.put("username", username);
                                 hashMap.put("status", "I'm online");
+                                hashMap.put("online_status", "offline");
 
                                 reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
