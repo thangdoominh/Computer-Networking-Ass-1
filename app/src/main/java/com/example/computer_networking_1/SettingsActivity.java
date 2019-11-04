@@ -3,6 +3,9 @@ package com.example.computer_networking_1;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -18,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -40,6 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView userid;
     private CircleImageView userProfileImage;
 
+    private FirebaseUser currentUser;
     private String currentUserID;
     private FirebaseAuth mAuth;
     private DatabaseReference reference;
@@ -89,6 +94,22 @@ public class SettingsActivity extends AppCompatActivity {
         RetrieveUserInfo();
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateOnlineStatus("online");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
+    }
+
 
     private void RetrieveUserInfo() {
         userid.setText(currentUserID);
@@ -248,6 +269,13 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
         } // --------  End of upload and storage profile image -----------------
+    }
+
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 }
 
