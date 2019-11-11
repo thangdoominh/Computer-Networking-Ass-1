@@ -115,24 +115,26 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists() && dataSnapshot.hasChild("username") && dataSnapshot.hasChild("imageURL")){
-                            String retrieveUserName = dataSnapshot.child("username").getValue().toString();
-                            String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
-                            String retrieveProfileImage = dataSnapshot.child("imageURL").getValue().toString();
 
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveUserStatus);
+                            if(dataSnapshot.child("imageURL").getValue().toString().equals("default"))
+                            {
+                                String retrieveUserName = dataSnapshot.child("username").getValue().toString();
+                                String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
 
-                            // ------- API load profile image ---------
-                            Picasso.get().load(retrieveProfileImage).into(userProfileImage);
+                                userName.setText(retrieveUserName);
+                                userStatus.setText(retrieveUserStatus);
+                            }
+                            else{
+                                String retrieveUserName = dataSnapshot.child("username").getValue().toString();
+                                String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
+                                String retrieveProfileImage = dataSnapshot.child("imageURL").getValue().toString();
 
+                                userName.setText(retrieveUserName);
+                                userStatus.setText(retrieveUserStatus);
 
-                        }
-                        else if(dataSnapshot.exists() && dataSnapshot.hasChild("username")){
-                            String retrieveUserName = dataSnapshot.child("username").getValue().toString();
-                            String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
-
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveUserStatus);
+                                // ------- API load profile image ---------
+                                Picasso.get().load(retrieveProfileImage).into(userProfileImage);
+                            }
                         }
                         else{
                             Toast.makeText(SettingsActivity.this,"Please update your profile information",Toast.LENGTH_SHORT).show();
