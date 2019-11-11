@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.1"
     defaultConfig {
         android.defaultConfig.vectorDrawables.useSupportLibrary = true
-        applicationId "com.example.chatfull"
+        applicationId "com.example.computer_networking_1"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
@@ -80,6 +80,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.android.volley:volley:1.1.1'
     implementation 'com.firebaseui:firebase-ui-database:4.2.1'
+//addnek
+    implementation "android.arch.lifecycle:extensions:1.1.0"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
 
 }
 apply plugin: 'com.google.gms.google-services'

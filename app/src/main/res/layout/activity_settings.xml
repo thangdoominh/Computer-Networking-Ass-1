@@ -12,10 +12,11 @@
         android:layout_height="200dp"
         android:src="@drawable/profile_image"
         app:civ_border_width="5dp"
+        app:civ_border_color="#E4B4CC"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop = "35dp"
-        app:civ_border_color="#272626"/>
+        />
     <TextView
         android:id="@+id/user_id"
         android:layout_height="wrap_content"
@@ -68,6 +69,18 @@
         android:layout_width="match_parent"
         android:layout_below="@id/set_profile_status"
         android:hint ="Update"
+        android:textAlignment="center"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="15dp"
+        android:textSize="25dp"
+        ></Button>
+    <Button
+        android:id="@+id/back_settings_button"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_below="@id/update_settings_button"
+        android:hint ="Back"
         android:textAlignment="center"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"

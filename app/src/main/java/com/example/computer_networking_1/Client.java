@@ -1,4 +1,4 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,6 +14,7 @@ import java.net.Socket;
 public class Client extends AsyncTask<Void, Void, String> {
 
     ConnectToUserActivity activity;
+    //ProfileActivity activity;
     private String dstAddress, serverResponse = "";
     private int dstPort;
     private Socket clientSocket = null;

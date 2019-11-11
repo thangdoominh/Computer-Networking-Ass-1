@@ -1,4 +1,4 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.content.Context;
 import android.content.Intent;

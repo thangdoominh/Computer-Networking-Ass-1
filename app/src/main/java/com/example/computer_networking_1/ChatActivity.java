@@ -1,15 +1,12 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,27 +15,25 @@ import android.os.Handler;
 import android.provider.OpenableColumns;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.bumptech.glide.Glide;
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.OnColorSelectedListener;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.messages.MessageHolders;
@@ -54,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class ChatActivity extends AppCompatActivity
@@ -87,20 +83,25 @@ public class ChatActivity extends AppCompatActivity
     ImageButton btnAttachment, btnImage;
     EditText input;
 
-    RelativeLayout back_view;
+    //RelativeLayout back_view;
     int[] colors;
 
     List<Message> messageArrayList;
     boolean saved = false, loaded = false, offline = false;
 
     Dialog dialog;
-
+    private FirebaseUser currentUser;
+    private String currentUserID;
+    private FirebaseAuth mAuth;
+    private DatabaseReference reference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_alternate);
         isStoragePermissionGranted();
-
+        mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference = FirebaseDatabase.getInstance().getReference();
         user = (User) getIntent().getSerializableExtra("user");
         Dialog dg = (Dialog) getIntent().getSerializableExtra("dialog");
         dialog = DialogViewActivity.dialogsAdapter.getItemById(dg.getId());
@@ -111,7 +112,7 @@ public class ChatActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(user.getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,14 +153,14 @@ public class ChatActivity extends AppCompatActivity
         btnImage = findViewById(R.id.bt_image);
 
         //Initialize color picker
-        back_view = findViewById(R.id.background_view);
+        //back_view = findViewById(R.id.background_view);
 
-        TypedArray ta = getApplicationContext().getResources().obtainTypedArray(R.array.colors);
-        colors = new int[ta.length()];
-        for (int i = 0; i < ta.length(); i++) {
-            colors[i] = ta.getColor(i, 0);
-        }
-        ta.recycle();
+        //TypedArray ta = getApplicationContext().getResources().obtainTypedArray(R.array.colors);
+//        colors = new int[ta.length()];
+//        for (int i = 0; i < ta.length(); i++) {
+//            colors[i] = ta.getColor(i, 0);
+//        }
+//        ta.recycle();
 
         adapter.setOnMessageLongClickListener(this);
         loaded = false;
@@ -196,6 +197,7 @@ public class ChatActivity extends AppCompatActivity
         saved = false;
     }
 
+
     public  boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -230,52 +232,52 @@ public class ChatActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu, menu);
+//        return true;
+//    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.background_button:
-                ColorPickerDialogBuilder
-                        .with(this)
-                        .setTitle("Choose color")
-                        .initialColor(Color.WHITE)
-                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                        .density(12)
-                        .setOnColorSelectedListener(new OnColorSelectedListener() {
-                            @Override
-                            public void onColorSelected(int selectedColor) {
-                                Toast.makeText(getApplicationContext(), "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .setPositiveButton("ok", new ColorPickerClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                Message message = new Message(Integer.toString(++cnt), DialogViewActivity.me, null, Calendar.getInstance().getTime());
-                                message.setColor(selectedColor);
-                                message.setIsColor(true);
-
-                                sender = new SendMessage(user.getIpAddress(), user.getPort(), message, ChatActivity.this);
-                                sender.execute();
-                                back_view.setBackgroundColor(selectedColor);
-                            }
-                        })
-                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .build()
-                        .show();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        int id = item.getItemId();
+//        switch (id) {
+//            case R.id.background_button:
+//                ColorPickerDialogBuilder
+//                        .with(this)
+//                        .setTitle("Choose color")
+//                        .initialColor(Color.WHITE)
+//                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+//                        .density(12)
+//                        .setOnColorSelectedListener(new OnColorSelectedListener() {
+//                            @Override
+//                            public void onColorSelected(int selectedColor) {
+//                                Toast.makeText(getApplicationContext(), "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_SHORT).show();
+//                            }
+//                        })
+//                        .setPositiveButton("ok", new ColorPickerClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+//                                Message message = new Message(Integer.toString(++cnt), DialogViewActivity.me, null, Calendar.getInstance().getTime());
+//                                message.setColor(selectedColor);
+//                                message.setIsColor(true);
+//
+//                                sender = new SendMessage(user.getIpAddress(), user.getPort(), message, ChatActivity.this);
+//                                sender.execute();
+//                                //back_view.setBackgroundColor(selectedColor);
+//                            }
+//                        })
+//                        .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                            }
+//                        })
+//                        .build()
+//                        .show();
+//                break;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     public void onBtnSendClick(View view) {
         if (input.getText().toString() == null) return;
@@ -471,9 +473,10 @@ public class ChatActivity extends AppCompatActivity
                         msg.setUser(user);
                         adapter.addToStart(msg, true);
                         messageArrayList.add(msg);
-                    } else if (msg.isColor()) {
-                        back_view.setBackgroundColor(msg.getColor());
                     }
+//                    else if (msg.isColor()) {
+//                        back_view.setBackgroundColor(msg.getColor());
+//                    }
 
 
                 }
@@ -501,6 +504,11 @@ public class ChatActivity extends AppCompatActivity
         }
 
         super.onPause();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
     }
 
     @Override
@@ -625,6 +633,12 @@ public class ChatActivity extends AppCompatActivity
             }
         }
         return newList;
+    }
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 
 }

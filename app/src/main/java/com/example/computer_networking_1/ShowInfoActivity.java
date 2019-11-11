@@ -1,4 +1,4 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,7 +7,14 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import net.glxn.qrgen.android.QRCode;
 
@@ -15,12 +22,16 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 public class ShowInfoActivity extends AppCompatActivity {
 
     private static final int selfPort = 8080;
     private Server myServer;
-
+    private FirebaseUser currentUser;
+    private String currentUserID;
+    private FirebaseAuth mAuth;
+    private DatabaseReference reference;
     public void setConnected(User user) {
         Intent data = new Intent();
         data.putExtra("user",user);
@@ -31,6 +42,7 @@ public class ShowInfoActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_info);
 
@@ -44,6 +56,9 @@ public class ShowInfoActivity extends AppCompatActivity {
         Bitmap myBitmap = QRCode.from(ip_address+":"+selfPort).bitmap();
         ImageView myImage = (ImageView) findViewById(R.id.qr_view);
         myImage.setImageBitmap(myBitmap);
+        mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -57,6 +72,11 @@ public class ShowInfoActivity extends AppCompatActivity {
         super.onPause();
         if (myServer != null)
             myServer.onDestroy();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
     }
 
     public static int getSelfPort() {
@@ -89,5 +109,11 @@ public class ShowInfoActivity extends AppCompatActivity {
             Log.e("GET_IP", "IP NOT FOUND");
         }
         return self_ip;
+    }
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.os.AsyncTask;
 import android.util.Log;

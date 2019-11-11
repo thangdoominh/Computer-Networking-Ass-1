@@ -1,4 +1,4 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -34,7 +34,6 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    //add
     private Button CreateAccountButton;
     private EditText UserEmail, UserPassword;
     private TextView AlreadyHaveAccountLink;
@@ -42,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseReference reference;
     private ProgressDialog loadingBar;
+
 
     Button showInfoBtn, enterInfoBtn, continueBtn;
     EditText nameInput;
@@ -63,6 +63,14 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         InitializeFields();
+        //add nek
+        AlreadyHaveAccountLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SendUserToLoginActivity();
+
+            }
+        });
 
 //        showInfoBtn = findViewById(R.id.showInfo);
 //        enterInfoBtn = findViewById(R.id.enterInfo);
@@ -234,5 +242,9 @@ public class MainActivity extends AppCompatActivity {
         AlreadyHaveAccountLink = (TextView) findViewById(R.id.already_have_account_link);
         loadingBar = new ProgressDialog(this);
         continueBtn = findViewById(R.id.continue_btn);
+    }
+    private void SendUserToLoginActivity() {
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
     }
 }

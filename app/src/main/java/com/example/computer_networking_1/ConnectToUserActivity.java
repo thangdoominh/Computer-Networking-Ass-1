@@ -1,4 +1,4 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,10 +14,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.notbytes.barcode_reader.BarcodeReaderActivity;
+
+import java.util.HashMap;
 
 public class ConnectToUserActivity extends AppCompatActivity{
 
@@ -28,6 +36,11 @@ public class ConnectToUserActivity extends AppCompatActivity{
     private Client myClient;
     private User user;
     FrameLayout progressOverlay;
+
+    private FirebaseUser currentUser;
+    private String currentUserID;
+    private FirebaseAuth mAuth;
+    private DatabaseReference reference;
 
     public void setUser(User user) {
         this.user = user;
@@ -48,6 +61,9 @@ public class ConnectToUserActivity extends AppCompatActivity{
         connectBtn = findViewById(R.id.connectBtn);
         scanBtn = findViewById(R.id.scan_button);
         progressOverlay = findViewById(R.id.progress_overlay);
+        mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference = FirebaseDatabase.getInstance().getReference();
 
     }
 
@@ -64,6 +80,11 @@ public class ConnectToUserActivity extends AppCompatActivity{
         super.onPause();
         if (myClient != null && !myClient.isCancelled())
             myClient.cancel(true);
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
     }
 
     @Override
@@ -71,6 +92,11 @@ public class ConnectToUserActivity extends AppCompatActivity{
         super.onDestroy();
         if (myClient != null && !myClient.isCancelled())
             myClient.cancel(true);
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
     }
 
     public void connectBtnListener(View view) {
@@ -117,6 +143,11 @@ public class ConnectToUserActivity extends AppCompatActivity{
             ipInput.setText(client_ip);
             portInput.setText(client_port);
         }
-
+    }
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 }

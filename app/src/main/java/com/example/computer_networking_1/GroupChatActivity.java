@@ -1,13 +1,11 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.telephony.mbms.MbmsErrors;
 import android.text.TextUtils;
-import android.view.Display;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;

@@ -14,7 +14,7 @@
         android:layout_height="57dp"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
-        android:background="@color/colorPurpleLight"
+        android:background="#03A9F4"
         android:theme="@style/ToolbarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,8 +59,8 @@
         android:paddingBottom="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         fab:menu_fab_label=""
-        fab:fab_colorNormal="@color/colorPurpleLight"
-        fab:fab_colorPressed="@color/colorPurpleDark"
+        fab:fab_colorNormal="#03A9F4"
+        fab:fab_colorPressed="#03A9F4"
         fab:fab_colorRipple="#99FFFFFF"
         fab:fab_showShadow="true"
         fab:menu_labels_colorPressed="#444444"
@@ -73,6 +73,14 @@
         fab:menu_labels_ellipsize="end"
         fab:menu_labels_singleLine="true">
 
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/createGroupFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_information"
+            fab:fab_label="Group"
+
+            fab:fab_size="mini" />
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/findFriendFab"
             android:layout_width="wrap_content"

@@ -1,20 +1,18 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,10 +25,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
+import java.io.Console;
+
 public class LoginActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private ProgressDialog loadingBar;
+    private DatabaseReference reference;
 
     private Button LoginButton;
     private EditText UserEmail,UserPassword;
@@ -139,15 +140,18 @@ public class LoginActivity extends AppCompatActivity {
                                 // userRef;
 
                                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                String id_user = mAuth.getCurrentUser().getUid();
-                                String username= FirebaseDatabase.getInstance().getReference().child("Users").child(id_user).child("username").toString();
-                                String ip_address=FirebaseDatabase.getInstance().getReference().child("Users").child(id_user).child("ip").toString();
-                                String port=FirebaseDatabase.getInstance().getReference().child("Users").child(id_user).child("port").toString();
-                                me = new User("1", username);
+                                String userid = currentUser.getUid();
+                                reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+                                String username= reference.child("username").toString();
+                                //Toast.makeText("lan2nek",Toast.LENGTH_SHORT).show();
+                                String ip_address=reference.child("ip").toString();
+                                String port=reference.child
+                                ("port").toString();
+                                me = new User("1", "lan2nek");
                                 String jsonDataString = gson.toJson(me);
                                 editor.putString(SHARED_PREFERENCES_KEY_USER_SELF, jsonDataString);
                                 editor.commit();
-                                //SendUserToMainActivity();
+                                SendUserToMainActivity();
 
                                 //add nek
 //                                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -155,8 +159,8 @@ public class LoginActivity extends AppCompatActivity {
 //                                progressOverlay.setVisibility(View.VISIBLE);
 ////                                myClient = new Client(ip_address, Integer.parseInt(port), this );
 ////                                myClient.execute();
-//                                Toast.makeText(LoginActivity.this,"Login successful.",Toast.LENGTH_SHORT).show();
-//                                loadingBar.dismiss();
+                                Toast.makeText(LoginActivity.this,"Login successful.",Toast.LENGTH_SHORT).show();
+                                loadingBar.dismiss();
                                 Intent intent = new Intent(getApplicationContext(), DialogViewActivity.class);
                                 startActivity(intent);
                                 finish();

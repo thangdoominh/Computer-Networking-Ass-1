@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    tools:context=".GroupChatFullActivity">
+    <com.github.clans.fab.FloatingActionMenu
+
+        android:id="@+id/fab_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        fab:menu_fab_label=""
+        fab:fab_colorNormal="#03A9F4"
+        fab:fab_colorPressed="#03A9F4"
+        fab:fab_colorRipple="#99FFFFFF"
+        fab:fab_showShadow="true"
+        fab:menu_labels_colorPressed="#444444"
+        fab:menu_labels_colorRipple="#66FFFFFF"
+        fab:menu_labels_showShadow="true"
+        fab:menu_labels_maxLines="-1"
+        fab:menu_labels_position="left"
+        fab:menu_openDirection="up"
+        fab:fab_shadowColor="#66000000"
+        fab:menu_labels_ellipsize="end"
+        fab:menu_labels_singleLine="true">
+    </com.github.clans.fab.FloatingActionMenu>
+
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <include
+            android:id="@+id/main_page_toolbar"
+            layout="@layout/app_bar_layout"
+
+            >
+        </include>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/main_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        </com.google.android.material.tabs.TabLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/main_tabs_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appBarLayout"
+        android:background="#FFFF">
+    </androidx.viewpager.widget.ViewPager>
+</RelativeLayout>
