@@ -1,0 +1,51 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+	package
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:3:5-42
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:1-13:12
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.CAMERA
+ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:5:5-65
+	android:name
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:5:22-62
+uses-feature#android.hardware.camera
+ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:7:5-60
+	android:name
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:7:19-57
+application
+ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:9:5-11:19
+activity#com.notbytes.barcode_reader.BarcodeReaderActivity
+ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:10:9-68
+	android:name
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml:10:19-56
+uses-sdk
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+		ADDED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
+		INJECTED from /Users/dominhthang/Thang/HK-191/Computer-Networking/Assignment/Computer-Networking-Ass-1/barcode-reader/src/main/AndroidManifest.xml
