@@ -1,19 +1,33 @@
-package com.example.chatfull;
+package com.example.computer_networking_1;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.chatkit.commons.ImageLoader;
@@ -22,10 +36,12 @@ import com.stfalcon.chatkit.dialogs.DialogsListAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class DialogViewActivity extends AppCompatActivity
         implements DialogsListAdapter.OnDialogClickListener<Dialog> {
+    private DatabaseReference reference;
 
     private static final int SHOW_INFO = 100;
     private static final int ENTER_INFO = 200;
@@ -50,7 +66,7 @@ public class DialogViewActivity extends AppCompatActivity
 
 
     private FloatingActionMenu fam;
-    private FloatingActionButton fabShowInfo, fabEnterInfo, fabLogout, fabSettings, fabFindFriend;
+    private FloatingActionButton fabShowInfo, fabEnterInfo, fabLogout, fabSettings, fabFindFriend, fabGroup;
 
     static List<Dialog> dialogArrayList;
     boolean loaded = false, saved = false;
@@ -58,11 +74,18 @@ public class DialogViewActivity extends AppCompatActivity
 
     String image;
 
+    private FirebaseUser currentUser;
+    private String currentUserID;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialog_view);
+        mAuth = FirebaseAuth.getInstance();
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference = FirebaseDatabase.getInstance().getReference();
+        //add nek
 
         image = "https://cdn1.imggmi.com/uploads/2019/10/19/5bf1857add4ee9b72b31257e2adb9030-full.png";
 
@@ -98,17 +121,19 @@ public class DialogViewActivity extends AppCompatActivity
         fabLogout = findViewById(R.id.logoutFab);
         fabSettings = findViewById(R.id.settingsFab);
         fabFindFriend = findViewById(R.id.findFriendFab);
+        fabGroup = findViewById(R.id.createGroupFab);
         fam = findViewById(R.id.fab_menu);
         fabShowInfo.setOnClickListener(onButtonClick());
         fabEnterInfo.setOnClickListener(onButtonClick());
         fabLogout.setOnClickListener(onButtonClick());
         fabSettings.setOnClickListener(onButtonClick());
         fabFindFriend.setOnClickListener(onButtonClick());
+        fabGroup.setOnClickListener(onButtonClick());
 
         loaded = false;
         saved = false;
         dialogArrayList = new ArrayList<>();
-
+        updateOnlineStatus("online");
     }
 
 
@@ -147,6 +172,11 @@ public class DialogViewActivity extends AppCompatActivity
             saved = true;
         }
         super.onPause();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
     }
 
     @Override
@@ -187,6 +217,7 @@ public class DialogViewActivity extends AppCompatActivity
                     startActivityForResult(intent, ENTER_INFO);
                 }
                 else if (view == fabLogout) {
+                    updateOnlineStatus("offline");
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivityForResult(intent, LOGOUT);
                     finish();
@@ -213,9 +244,69 @@ public class DialogViewActivity extends AppCompatActivity
                     //finish();
 
                 }
+                else if (view == fabGroup) {
+                    Intent createGroupIntent = new Intent(DialogViewActivity.this, GroupChatFullActivity.class);
+                    //settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(createGroupIntent);
+                    finish();
+
+
+                }
                 fam.close(true);
             }
         };
+    }
+
+    private void RequestNewGroup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(DialogViewActivity.this, R.style.AlertDialog);
+        builder.setTitle("Enter Group Name: ");
+
+        final EditText groupNameField = new EditText(DialogViewActivity.this);
+        groupNameField.setHint("e.g Thieu nu team");
+        builder.setView(groupNameField);
+
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String groupName = groupNameField.getText().toString();
+
+                if (TextUtils.isEmpty(groupName))
+                {
+                    Toast.makeText(DialogViewActivity.this, "Please write Group Name ...", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    Toast.makeText(DialogViewActivity.this, "DKM", Toast.LENGTH_SHORT).show();
+                    CreateNewGroup(groupName);
+                    Intent createGroupIntent = new Intent(DialogViewActivity.this, GroupChatFullActivity.class);
+                    //settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(createGroupIntent);
+                    finish();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void CreateNewGroup(final String groupName) {
+        reference.child("Groups").child(groupName).setValue("")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful())
+                        {
+                            Toast.makeText(DialogViewActivity.this,groupName+ "is successful", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
     }
 
     @Override
@@ -249,5 +340,12 @@ public class DialogViewActivity extends AppCompatActivity
         intent.putExtra("user", dialog.getUsers().get(0));
         intent.putExtra("dialog", dialog);
         startActivity(intent);
+    }
+
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 }
