@@ -4,30 +4,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent"
     tools:context=".MainActivity">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <ImageView
+        android:id="@+id/register_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <include
-            android:id="@+id/main_page_toolbar"
-            layout="@layout/app_bar_layout"
-            >
-        </include>
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/main_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        </com.google.android.material.tabs.TabLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/main_tabs_pager"
+        android:layout_height="250dp"
+        android:src = "@drawable/signup_photo"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitCenter"
+        />
+    <EditText
+        android:id="@+id/register_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/appBarLayout">
-    </androidx.viewpager.widget.ViewPager>
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/register_image"
+        android:background="@drawable/inputs"
+        android:inputType="textEmailAddress"
+        android:hint="Email..."
+        android:padding="4dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        />
+    <EditText
+        android:id="@+id/nameInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/register_email"
+        android:background="@drawable/inputs"
+        android:inputType="text"
+        android:hint="Username"
+        android:maxLength="16"
+        android:padding="4dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        />
+    <EditText
+        android:id="@+id/register_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/nameInput"
+        android:background="@drawable/inputs"
+        android:inputType="textPassword"
+        android:hint="Password..."
+        android:maxLength="16"
+        android:padding="4dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"/>
+    <Button
+        android:id="@+id/continue_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/register_password"
+        android:padding="4dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginRight="17dp"
+        android:text="Create Account"
+        android:textAllCaps="false"
+        android:textSize="22sp"
+        android:textColor="@android:color/background_dark"
+        android:drawable="@drawable/buttons"
+        />
+    <TextView
+        android:id="@+id/already_have_account_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/continue_btn"
+        android:text="Already have account?"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="19dp"
+        android:layout_marginRight="19dp"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"
+        />
 </RelativeLayout>

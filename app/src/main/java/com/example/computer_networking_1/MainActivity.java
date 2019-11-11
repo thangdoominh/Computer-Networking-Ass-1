@@ -1,194 +1,252 @@
 package com.example.computer_networking_1;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ProcessLifecycleOwner;
-import androidx.viewpager.widget.ViewPager;
-
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.HashMap;
 
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-    private Toolbar mToolbar;
-    private ViewPager myViewPager;
-    private TabLayout myTabLayout;
-    private TabAccessorAdapter myTabAccessorAdapter;
 
-    private FirebaseUser currentUser;
+    private Button CreateAccountButton;
+    private EditText UserEmail, UserPassword;
+    private TextView AlreadyHaveAccountLink;
+
     private FirebaseAuth mAuth;
     private DatabaseReference reference;
-    String currentUserID;
+    private ProgressDialog loadingBar;
+
+
+    Button showInfoBtn, enterInfoBtn, continueBtn;
+    EditText nameInput;
+    User me; // Assign Self Username
+
+    private final static String SHARED_PREFERENCES_KEY_USER_SELF = "ME";
+    private static String PREFERENCE_FILE_KEY = "SELF_INFO";
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor editor;
+    Gson gson;
+    private static final int selfPort = 8080;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //add
         mAuth = FirebaseAuth.getInstance();
-        currentUser = mAuth.getCurrentUser();
-        reference = FirebaseDatabase.getInstance().getReference();
 
-        mToolbar = (Toolbar) findViewById(R.id.main_page_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle("Brotherhood");
+        InitializeFields();
+        //add nek
+        AlreadyHaveAccountLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SendUserToLoginActivity();
 
-        myViewPager = (ViewPager) findViewById(R.id.main_tabs_pager);
-        myTabAccessorAdapter = new TabAccessorAdapter(getSupportFragmentManager());
-        myViewPager.setAdapter(myTabAccessorAdapter);
+            }
+        });
 
-        myTabLayout = (TabLayout) findViewById(R.id.main_tabs);
-        myTabLayout.setupWithViewPager(myViewPager);
+//        showInfoBtn = findViewById(R.id.showInfo);
+//        enterInfoBtn = findViewById(R.id.enterInfo);
+        nameInput = findViewById(R.id.nameInput);
 
 
+        gson = new Gson();
+        sharedPref = this.getSharedPreferences(
+                PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        editor = sharedPref.edit();
+        String jsonDataString = sharedPref.getString(SHARED_PREFERENCES_KEY_USER_SELF, "");
+        me = gson.fromJson(jsonDataString, User.class);
+
+        continueBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(nameInput.getText().toString().length() < 1){
+                    Snackbar snackbar = Snackbar
+                            .make(nameInput, "Please Enter Username", Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                    return;
+                }
+                me = new User("1", nameInput.getText().toString());
+                String jsonDataString = gson.toJson(me);
+                editor.putString(SHARED_PREFERENCES_KEY_USER_SELF, jsonDataString);
+                editor.commit();
+
+                CreateNewAccount();
+
+            }
+        });
+
+//        showInfoBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(nameInput.getText().toString().length() < 1){
+//                    Snackbar snackbar = Snackbar
+//                            .make(nameInput, "Please Enter Username", Snackbar.LENGTH_LONG);
+//                    snackbar.show();
+//                    return;
+//                }
+//                me = new User("1", nameInput.getText().toString());
+//                Intent intent = new Intent(getApplicationContext(), ShowInfoActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        enterInfoBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(nameInput.getText().toString().length() < 1){
+//                    Snackbar snackbar = Snackbar
+//                            .make(nameInput, "Please Enter Username", Snackbar.LENGTH_LONG);
+//                    snackbar.show();
+//                    return;
+//                }
+//                me = new User("1", nameInput.getText().toString());
+//                Intent intent = new Intent(getApplicationContext(), ConnectToUserActivity.class);
+//                startActivity(intent);
+//            }
+//        });
     }
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if(currentUser == null){
-            SendUserToLoginActivity();
+    private void CreateNewAccount() {
+        String email = UserEmail.getText().toString();
+        String password = UserPassword.getText().toString();
+        final String username = nameInput.getText().toString();
+        final String ip_address = getSelfIpAddress();
+        if(TextUtils.isEmpty(email)){
+            Toast.makeText(this,"Please enter your email!"+username,Toast.LENGTH_SHORT).show();
+        }
+        if(TextUtils.isEmpty(password)){
+            Toast.makeText(this,"Please enter your password!",Toast.LENGTH_SHORT).show();
+        }
+        if(password.length() < 6){
+            Toast.makeText(this,"Password must be at least 6 characters",Toast.LENGTH_SHORT).show();
         }
         else{
-            updateOnlineStatus("online");
+            loadingBar.setTitle("Creating New Account");
+            loadingBar.setMessage("Please wait...");
+            loadingBar.setCanceledOnTouchOutside(true);
+            loadingBar.show();
+            mAuth.createUserWithEmailAndPassword(email,password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(task.isSuccessful()){
+                                FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                                assert firebaseUser != null;
+                                String userid = firebaseUser.getUid();
+                                reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+                                HashMap<String,String> hashMap = new HashMap<>();
+                                hashMap.put("id",userid);
+                                hashMap.put("imageURL","default");
+                                hashMap.put("ip",ip_address);
+                                hashMap.put("port",Integer.toString(selfPort));
+                                if(TextUtils.isEmpty(username)) hashMap.put("username", userid);
+                                else hashMap.put("username", username);
+                                hashMap.put("status", "I'm online");
+
+                                reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            Toast.makeText(MainActivity.this, "Account created"+username,Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(getApplicationContext(), DialogViewActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    }
+                                });
+                                //Toast.makeText(MainActivity.this, "Account created"+username,Toast.LENGTH_SHORT).show();
+                                loadingBar.dismiss();
+                            }
+                            else{
+                                String message = task.getException().toString();
+                                Toast.makeText(MainActivity.this, "Error: " + message,Toast.LENGTH_SHORT).show();
+                                loadingBar.dismiss();
+                            }
+                        }
+                    });
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
-            else updateOnlineStatus("online");
+    private String getSelfIpAddress() {
+        String self_ip = "";
+        try {
+            Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface
+                    .getNetworkInterfaces();
+            while (enumNetworkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = enumNetworkInterfaces
+                        .nextElement();
+                Enumeration<InetAddress> enumInetAddress = networkInterface
+                        .getInetAddresses();
+                while (enumInetAddress.hasMoreElements()) {
+                    InetAddress inetAddress = enumInetAddress
+                            .nextElement();
+
+                    if (inetAddress.isSiteLocalAddress()) {
+                        self_ip = inetAddress.getHostAddress();
+                    }
+                }
+            }
+
+        } catch (SocketException e) {
+            e.printStackTrace();
+            Log.e("GET_IP", "IP NOT FOUND");
         }
+        return self_ip;
+    }
+    public static int getSelfPort() {
+        return selfPort;
     }
 
+    private void SendUserToDialogView() {
 
+        Intent intent = new Intent(getApplicationContext(), DialogViewActivity.class);
+        //settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
-
+    private void InitializeFields() {
+        CreateAccountButton = (Button) findViewById(R.id.continue_btn);
+        UserEmail = (EditText) findViewById(R.id.register_email);
+        UserPassword = (EditText) findViewById(R.id.register_password);
+        nameInput = (EditText) findViewById(R.id.nameInput);
+        AlreadyHaveAccountLink = (TextView) findViewById(R.id.already_have_account_link);
+        loadingBar = new ProgressDialog(this);
+        continueBtn = findViewById(R.id.continue_btn);
+    }
     private void SendUserToLoginActivity() {
         Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
-        loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(loginIntent);
-        finish();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.options_menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        super.onOptionsItemSelected(item);
-        if(item.getItemId() == R.id.main_logout_option){
-            updateOnlineStatus("offline");
-            mAuth.signOut();
-            SendUserToLoginActivity();
-        }
-        if(item.getItemId() == R.id.main_settings_option){
-            SendUserToSettingsActivity();
-        }
-        if(item.getItemId() == R.id.main_find_friends_option){
-            SendUserToFindFriendsActivity();
-        }
-        if(item.getItemId() == R.id.main_create_group_option)
-        {
-            RequestNewGroup();
-        }
-        return true;
-    }
-
-    private void RequestNewGroup()
-    {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialog);
-        builder.setTitle("Enter Group Name: ");
-
-        final EditText groupNameField = new EditText(MainActivity.this);
-        groupNameField.setHint("e.g Thieu nu team");
-        builder.setView(groupNameField);
-
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String groupName = groupNameField.getText().toString();
-
-                if (TextUtils.isEmpty(groupName))
-                {
-                    Toast.makeText(MainActivity.this, "Please write Group Name ...", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    CreateNewGroup(groupName);
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.cancel();
-            }
-        });
-
-        builder.show();
-    }
-
-    private void CreateNewGroup(String groupName)
-    {
-        reference.child("Groups").child(groupName).setValue("")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful())
-                        {
-                            Toast.makeText(MainActivity.this,groupName+ "is successful", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-    }
-
-    private void SendUserToSettingsActivity() {
-        Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(settingsIntent);
-        finish();
-    }
-
-    private void SendUserToFindFriendsActivity() {
-        Intent findFriendsIntent = new Intent(MainActivity.this, FindFriendActivity.class);
-        startActivity(findFriendsIntent);
-    }
-
-    private void updateOnlineStatus(String online_status){
-        HashMap<String,Object> hashMap = new HashMap<>();
-        hashMap.put("online_status",online_status);
-        currentUserID = mAuth.getCurrentUser().getUid();
-        reference.child("Users").child(currentUserID).updateChildren(hashMap);
-    }
-
 }

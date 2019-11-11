@@ -1,9 +1,10 @@
 package com.example.computer_networking_1;
 
 public class Contacts {
-    private String username, status, imageURL;
+    public String username, status, imageURL,ip,port;
 
     public Contacts(){
+
     }
 
     public String getUsername() {
@@ -28,5 +29,19 @@ public class Contacts {
 
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
+    }
+
+    public String getIp(){return ip;}
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 }

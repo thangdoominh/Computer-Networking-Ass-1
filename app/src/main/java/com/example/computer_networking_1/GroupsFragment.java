@@ -51,11 +51,11 @@ public class GroupsFragment extends Fragment
         // Inflate the layout for this fragment
         groupFragmentView = inflater.inflate(R.layout.fragment_groups, container, false);
 
-        
-        
+
+
         GroupRef = FirebaseDatabase.getInstance().getReference().child("Groups");
         InitializeFields();
-        
+
         RetrieveAndDisplayGroups();
 
         list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {

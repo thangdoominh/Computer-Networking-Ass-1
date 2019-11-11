@@ -5,9 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.telephony.mbms.MbmsErrors;
 import android.text.TextUtils;
-import android.view.Display;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -64,8 +62,8 @@ public class GroupChatActivity extends AppCompatActivity
 
 
         InitializeFields();
-        
-        
+
+
         GetUserInfo();
 
 
@@ -96,7 +94,7 @@ public class GroupChatActivity extends AppCompatActivity
             }
 
             @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) 
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s)
             {
                 if(dataSnapshot.exists())
                 {
@@ -188,10 +186,10 @@ public class GroupChatActivity extends AppCompatActivity
             GroupMessageKeyRef = GroupNameRef.child(messageKey);
 
             HashMap<String, Object> messageInfoMap = new HashMap<>();
-                messageInfoMap.put("username", currentUserName);
-                messageInfoMap.put("message", message);
-                messageInfoMap.put("date", currentDate);
-                messageInfoMap.put("time", currentTime);
+            messageInfoMap.put("username", currentUserName);
+            messageInfoMap.put("message", message);
+            messageInfoMap.put("date", currentDate);
+            messageInfoMap.put("time", currentTime);
             GroupMessageKeyRef.updateChildren(messageInfoMap);
 
 

@@ -36,16 +36,19 @@ import java.util.HashMap;
 import com.squareup.picasso.Picasso;
 
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SettingsActivity extends AppCompatActivity {
-    private Button UpdateAccountSettings, backButton;
+    private Button UpdateAccountSettings,backSettings;
     private EditText userName, userStatus;
     private TextView userid;
     private CircleImageView userProfileImage;
 
     private FirebaseUser currentUser;
     private String currentUserID;
+    private FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private DatabaseReference reference;
 
@@ -73,13 +76,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        backButton.setOnClickListener(new View.OnClickListener() {
+        backSettings.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                SendUserToMainActivity();
+            public void onClick(View view) {
+                SendUserToDialogViewActivity();
             }
         });
-
         // chọn ảnh cho profile
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +96,21 @@ public class SettingsActivity extends AppCompatActivity {
         RetrieveUserInfo();
 
     }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        updateOnlineStatus("online");
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) updateOnlineStatus("offline");
+            else updateOnlineStatus("online");
+        }
+    }
+
 
     @Override
     protected void onStart() {
@@ -118,24 +135,26 @@ public class SettingsActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists() && dataSnapshot.hasChild("username") && dataSnapshot.hasChild("imageURL")){
-                            String retrieveUserName = dataSnapshot.child("username").getValue().toString();
-                            String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
-                            String retrieveProfileImage = dataSnapshot.child("imageURL").getValue().toString();
 
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveUserStatus);
+                            if(dataSnapshot.child("imageURL").getValue().toString().equals("default"))
+                            {
+                                String retrieveUserName = dataSnapshot.child("username").getValue().toString();
+                                String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
 
-                            // ------- API load profile image ---------
-                            Picasso.get().load(retrieveProfileImage).into(userProfileImage);
+                                userName.setText(retrieveUserName);
+                                userStatus.setText(retrieveUserStatus);
+                            }
+                            else{
+                                String retrieveUserName = dataSnapshot.child("username").getValue().toString();
+                                String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
+                                String retrieveProfileImage = dataSnapshot.child("imageURL").getValue().toString();
 
+                                userName.setText(retrieveUserName);
+                                userStatus.setText(retrieveUserStatus);
 
-                        }
-                        else if(dataSnapshot.exists() && dataSnapshot.hasChild("username")){
-                            String retrieveUserName = dataSnapshot.child("username").getValue().toString();
-                            String retrieveUserStatus = dataSnapshot.child("status").getValue().toString();
-
-                            userName.setText(retrieveUserName);
-                            userStatus.setText(retrieveUserStatus);
+                                // ------- API load profile image ---------
+                                Picasso.get().load(retrieveProfileImage).into(userProfileImage);
+                            }
                         }
                         else{
                             Toast.makeText(SettingsActivity.this,"Please update your profile information",Toast.LENGTH_SHORT).show();
@@ -150,7 +169,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void UpdateSettings(){
-        String setUserName = userName.getText().toString();
+        final String setUserName = userName.getText().toString();
         String setStatus = userStatus.getText().toString();
         if (TextUtils.isEmpty(setUserName)){
             Toast.makeText(this,"Please write your username...",Toast.LENGTH_SHORT).show();
@@ -169,7 +188,7 @@ public class SettingsActivity extends AppCompatActivity {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()){
-                                                    SendUserToMainActivity();
+                                                    SendUserToDialogViewActivity();
                                                     Toast.makeText(SettingsActivity.this,"Profile updated successfully!",Toast.LENGTH_SHORT).show();
                                                 }
                                                 else{
@@ -188,8 +207,8 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-    private void SendUserToMainActivity() {
-        Intent mainIntent = new Intent(SettingsActivity.this, MainActivity.class);
+    private void SendUserToDialogViewActivity() {
+        Intent mainIntent = new Intent(SettingsActivity.this, DialogViewActivity.class);
         mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(mainIntent);
         finish();
@@ -198,7 +217,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void InitializeFields() {
         UpdateAccountSettings = (Button) findViewById(R.id.update_settings_button);
-        backButton = (Button)findViewById(R.id.back_button);
+        backSettings = (Button) findViewById(R.id.back_settings_button);
         userid = (TextView) findViewById(R.id.user_id);
         userName = (EditText) findViewById(R.id.set_user_name);
         userStatus = (EditText) findViewById(R.id.set_profile_status);
@@ -269,6 +288,13 @@ public class SettingsActivity extends AppCompatActivity {
                 });
             }
         } // --------  End of upload and storage profile image -----------------
+
+    }
+    private void updateOnlineStatus(String online_status){
+        HashMap<String,Object> hashMap = new HashMap<>();
+        hashMap.put("online_status",online_status);
+        currentUserID = mAuth.getCurrentUser().getUid();
+        reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 
     private void updateOnlineStatus(String online_status){
@@ -278,20 +304,3 @@ public class SettingsActivity extends AppCompatActivity {
         reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -67,14 +67,14 @@ public class ContactsFragment extends Fragment {
 
         FirebaseRecyclerOptions options =
                 new FirebaseRecyclerOptions.Builder<Contacts>()
-                .setQuery(ContactRef, Contacts.class)
-                .build();
+                        .setQuery(ContactRef, Contacts.class)
+                        .build();
 
         FirebaseRecyclerAdapter<Contacts, ContactsViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, ContactsViewHolder>(options) {
 
                     @Override
-                    protected void onBindViewHolder(@NonNull ContactsViewHolder contactsViewHolder, int position, @NonNull Contacts contacts) {
+                    protected void onBindViewHolder(@NonNull final ContactsViewHolder contactsViewHolder, int position, @NonNull Contacts contacts) {
 
                         String userIDs = getRef(position).getKey();
 

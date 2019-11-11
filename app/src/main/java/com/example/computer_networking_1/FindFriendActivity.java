@@ -8,7 +8,6 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import android.content.Intent;
 import android.os.Build;
@@ -16,7 +15,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,7 +24,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -64,24 +61,32 @@ public class FindFriendActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Find Friends");
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),DialogViewActivity.class));
+            }
+        });
 
     }
+
 
     protected void onStart(){
         super.onStart();
         updateOnlineStatus("online");
         FirebaseRecyclerOptions<Contacts> options =
                 new FirebaseRecyclerOptions.Builder<Contacts>()
-                .setQuery(UsersRef, Contacts.class)
-                .build();
+                        .setQuery(UsersRef, Contacts.class)
+                        .build();
 
         FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Contacts, FindFriendViewHolder>(options) {
                     @Override
-                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, int position, @NonNull Contacts model) {
+                    protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, final int position, @NonNull Contacts model) {
                         holder.userName.setText(model.getUsername());
                         holder.userStatus.setText(model.getStatus());
                         holder.online_status.setVisibility(View.GONE);
+
                         Picasso.get().load(model.getImageURL()).into(holder.profileImage);
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +122,7 @@ public class FindFriendActivity extends AppCompatActivity {
         }
     }
     public static class FindFriendViewHolder extends RecyclerView.ViewHolder{
-        TextView userName, userStatus;
+        TextView userName, userStatus, userIP, userPort;
         CircleImageView profileImage;
         ImageView online_status;
         public FindFriendViewHolder(@NonNull View itemView) {
@@ -126,6 +131,8 @@ public class FindFriendActivity extends AppCompatActivity {
             userStatus = itemView.findViewById(R.id.user_status);
             profileImage = itemView.findViewById(R.id.user_profile_image);
             online_status = itemView.findViewById(R.id.user_online_status);
+            //userIP = itemView.findViewById(R.id.user_profile_ip);
+            //online_status = itemView.findViewById(R.id.user_pro);
         }
     }
 
@@ -136,21 +143,3 @@ public class FindFriendActivity extends AppCompatActivity {
         reference.child("Users").child(currentUserID).updateChildren(hashMap);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
